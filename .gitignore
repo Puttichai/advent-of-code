@@ -1,0 +1,6 @@
+# emacs
+*~
+
+# rust
+target/
+debug/
