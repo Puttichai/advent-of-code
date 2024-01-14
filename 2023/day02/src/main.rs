@@ -10,6 +10,8 @@ fn main() {
 		.expect("File {file_path} is not valid");
 	let result1: u32 = part1(&contents);
 	println!("result1 = {result1}");
+	let result2: u32 = part2(&contents);
+	println!("result2 = {result2}");
 }
 
 fn part1(contents: &str) -> u32 {
@@ -50,4 +52,46 @@ fn analyze_game_samples(samples: &str, num_red: u32, num_green: u32, num_blue: u
 		}
 	}
 	true
+}
+
+fn part2(contents: &str) -> u32 {
+	let mut power: u32 = 0;
+	for line in contents.lines() {
+		let v: Vec<&str> = line.split(":").collect();
+		power += compute_power(&v[1]);
+	}
+	power
+}
+
+fn compute_power(samples: &str) -> u32 {
+	let mut min_red: u32 = 0;
+	let mut min_green: u32 = 0;
+	let mut min_blue: u32 = 0;
+	for sample in samples.trim().split(";") {
+		for set in sample.trim().split(",") {
+			let (number_str, color_str) = set.trim().split_once(" ").unwrap();
+			let num_cubes: u32 = number_str.parse::<u32>().unwrap();
+			match color_str {
+				"red" => {
+					if num_cubes > min_red {
+						min_red = num_cubes;
+					}
+				},
+				"green" => {
+					if num_cubes > min_green {
+						min_green = num_cubes;
+					}
+				},
+				"blue" => {
+					if num_cubes > min_blue {
+						min_blue = num_cubes;
+					}
+				},
+				&_ => {
+					// Nothing to do
+				},
+			}
+		}
+	}
+	min_red*min_green*min_blue
 }
