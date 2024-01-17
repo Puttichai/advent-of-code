@@ -26,6 +26,9 @@ fn part1(contents: &str) -> u32 {
                 if istart >= line_len {
                     istart = ich;
                 }
+                if ich == line_len - 1 {
+                    iend = ich;
+                }
             }
             else {
                 if istart < line_len {
