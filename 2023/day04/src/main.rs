@@ -10,32 +10,48 @@ fn main() {
         .expect("File {file_path} is not valid");
     let result1: u32 = part1(&contents);
     println!("result1 = {result1}");
+
+    let result2: u32 = part2(&contents);
+    println!("result2 = {result2}");
 }
 
 fn part1(contents: &str) -> u32 {
     let mut total_score: u32 = 0;
     for line in contents.lines() {
-        let score: u32 = compute_line_score(line);
-        total_score += score;
+        let num_matches: u32 = check_num_matches(line);
+        if num_matches > 0 {
+            total_score += 2_u32.pow(num_matches - 1);
+        }
     }
     total_score
 }
 
-fn compute_line_score(line: &str) -> u32 {
+fn check_num_matches(line: &str) -> u32 {
     let v1: Vec<&str> = line.split(":").collect();
     let v2: Vec<&str> = v1[1].split("|").collect();
     let winning_numbers_str: Vec<&str> = v2[0].trim().split_whitespace().collect();
     let own_numbers_str: Vec<&str> = v2[1].trim().split_whitespace().collect();
-    let mut num_matched: u32 = 0;
+    let mut num_matches: u32 = 0;
     for own_number_str in own_numbers_str {
         if winning_numbers_str.contains(&own_number_str) {
-            num_matched += 1;
+            num_matches += 1;
         }
     }
-    if num_matched > 0 {
-        2_u32.pow(num_matched - 1)
+    num_matches
+}
+
+fn part2(contents: &str) -> u32 {
+    let lines: Vec<&str> = contents.lines().collect();
+    let num_lines: usize = lines.len();
+    let mut num_cards: Vec<u32> = vec![1; num_lines]; // each numbered card has one original copy
+    for (icard, line) in lines.iter().enumerate() {
+        let num_matches: u32 = check_num_matches(line);
+        let num_current_card: u32 = num_cards[icard];
+        if num_matches > 0 {
+            for next_card_index in (icard + 1)..=(icard + (num_matches as usize)) {
+                num_cards[next_card_index] += num_current_card;
+            }
+        }
     }
-    else {
-        0
-    }
+    num_cards.iter().sum()
 }
