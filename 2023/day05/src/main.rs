@@ -10,8 +10,10 @@ fn main() {
         .expect("File {file_path} is not valid");
 
     let seeds: Vec<u64> = extract_seeds(&contents);
-    let seed_to_soil_map: Vec<[u64; 3]> = extract_seed_to_soil_map(&contents);
-    let result1: u64 = part1(&seeds, &seed_to_soil_map);
+    println!("There are {} seeds", seeds.len());
+    let input_maps: Vec<Vec<[u64; 3]>> = extract_maps(&contents);
+    println!("There are {} maps", input_maps.len());
+    let result1: u64 = part1(&seeds, &input_maps);
     println!("result1 = {result1}");
 }
 
@@ -27,48 +29,54 @@ fn extract_seeds(contents: &str) -> Vec<u64> {
     seeds
 }
 
-fn extract_seed_to_soil_map(contents: &str) -> Vec<[u64; 3]> {
-    let mut seed_to_soil_map: Vec<[u64; 3]> = vec![];
+fn extract_maps(contents: &str) -> Vec<Vec<[u64; 3]>> {
+    let mut maps: Vec<Vec<[u64; 3]>> = vec![];
     let mut started: bool = false;
+    let mut map: Vec<[u64; 3]> = vec![];
     for line in contents.lines() {
-        if !started && line.contains("seed-to-soil") {
+        if !started && line.contains(":") && !line.contains("seeds:") {
             started = true;
             continue;
         }
         if started {
             if line.len() == 0 {
-                break;
+                maps.push(map.clone());
+                map.clear();
+                started = false;
+                continue;
             }
             let v: Vec<&str> = line.trim().split_whitespace().collect();
             assert!(v.len() == 3);
-            seed_to_soil_map.push( [v[0].parse::<u64>().unwrap(),
-                                    v[1].parse::<u64>().unwrap(),
-                                    v[2].parse::<u64>().unwrap()] );
+            map.push( [v[0].parse::<u64>().unwrap(),
+                       v[1].parse::<u64>().unwrap(),
+                       v[2].parse::<u64>().unwrap()] );
         }
     }
-    seed_to_soil_map
+    maps.push(map.clone());
+    maps
 }
 
-fn part1(seeds: &Vec<u64>, seed_to_soil_map: &Vec<[u64; 3]>) -> u64 {
-    let mut min_dest: Option<u64> = None;
-    for seed in seeds {
-        let dest: u64 = find_seed_destination(seed, seed_to_soil_map);
-        if min_dest.is_none() || dest < min_dest.unwrap() {
-            min_dest = Some(dest);
+fn part1(seeds: &Vec<u64>, maps: &Vec<Vec<[u64; 3]>>) -> u64 {
+    let mut input_indices: Vec<u64> = seeds.clone();
+    for map in maps {
+        let mut output_indices: Vec<u64> = vec![];
+        for index in input_indices {
+            let dest: u64 = find_destination(&index, map);
+            output_indices.push(dest);
         }
+        input_indices = output_indices;
     }
-    assert!( min_dest.is_some() );
-    min_dest.unwrap()
+    *input_indices.iter().min().unwrap()
 }
 
-fn find_seed_destination(seed: &u64, seed_to_soil_map: &Vec<[u64; 3]>) -> u64 {
-    for dest_source_len in seed_to_soil_map {
+fn find_destination(index: &u64, map: &Vec<[u64; 3]>) -> u64 {
+    for dest_source_len in map {
         let dest: u64 = dest_source_len[0];
         let source: u64 = dest_source_len[1];
         let len: u64 = dest_source_len[2];
-        if source <= *seed && *seed < source + len {
-            return dest + (*seed - source);
+        if source <= *index && *index < source + len {
+            return dest + (*index - source);
         }
     }
-    *seed
+    *index
 }
