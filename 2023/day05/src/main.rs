@@ -25,15 +25,17 @@ fn main() {
 }
 
 fn extract_seeds(contents: &str) -> Vec<u64> {
-    let mut seeds: Vec<u64> = vec![];
-    let lines: Vec<&str> = contents.lines().collect();
-    let line: &str = lines[0];
-    let v1: Vec<&str> = line.trim().split(":").collect();
-    let v2: Vec<&str> = v1[1].trim().split_whitespace().collect();
-    for seed_str in v2 {
-        seeds.push( seed_str.parse::<u64>().unwrap() );
-    }
-    seeds
+    let first_line: &str = &contents[
+        (contents.chars().position(|c| c == ':').unwrap() + 1)..(contents.chars().position(|c| c == '\n').unwrap())
+    ]
+        .trim();
+
+    let seed_strs: Vec<&str> = first_line.split_whitespace().collect();
+    seed_strs.into_iter()
+        .map(|seed_str| {
+            seed_str.parse::<u64>().unwrap()
+        })
+        .collect()
 }
 
 fn extract_seeds2(contents: &str) -> Vec<u64> {
