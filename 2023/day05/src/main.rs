@@ -10,18 +10,9 @@ fn main() {
         .expect("File {file_path} is not valid");
 
     let seeds: Vec<u64> = extract_seeds(&contents);
-    println!("There are {} seeds", seeds.len());
     let input_maps: Vec<Vec<[u64; 3]>> = extract_maps(&contents);
-    println!("There are {} maps", input_maps.len());
     let result1: u64 = part1(&seeds, &input_maps);
     println!("result1 = {result1}");
-
-    // // Part2: same as part 1 but different inputs
-    // TODO: Cannot use the same naive method for part 2 or the machine will crash
-    // let seeds2: Vec<u64> = extract_seeds2(&contents);
-    // println!("There are actually {} seeds", seeds2.len());
-    // let result2: u64 = part1(&seeds2, &input_maps);
-    // println!("result2 = {result2}");
 }
 
 fn extract_seeds(contents: &str) -> Vec<u64> {
@@ -36,23 +27,6 @@ fn extract_seeds(contents: &str) -> Vec<u64> {
             seed_str.parse::<u64>().unwrap()
         })
         .collect()
-}
-
-fn extract_seeds2(contents: &str) -> Vec<u64> {
-    let mut seeds: Vec<u64> = vec![];
-    let lines: Vec<&str> = contents.lines().collect();
-    let line: &str = lines[0];
-    let v1: Vec<&str> = line.trim().split(":").collect();
-    let v2: Vec<&str> = v1[1].trim().split_whitespace().collect();
-    let num_pairs: usize = v2.len()/2;
-    for ipair in 0..num_pairs {
-        let seed_start: u64 = v2[2*ipair + 0].parse::<u64>().unwrap();
-        let seed_range_len: u64 = v2[2*ipair + 1].parse::<u64>().unwrap();
-        for seed in seed_start..(seed_start + seed_range_len) {
-            seeds.push(seed);
-        }
-    }
-    seeds
 }
 
 fn extract_maps(contents: &str) -> Vec<Vec<[u64; 3]>> {
