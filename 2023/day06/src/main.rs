@@ -12,10 +12,17 @@ fn main() {
     
     let times: Vec<u64> = extract_numbers(&lines[0]);
     let distances: Vec<u64> = extract_numbers(&lines[1]);
-    println!("times={:?}", times);
-    println!("distances={:?}", distances);
+    println!("times = {:?}", times);
+    println!("distances = {:?}", distances);
     let result1: u64 = part1(&times, &distances);
     println!("result1 = {result1}");
+
+    let time: u64 = extract_number(&lines[0]);
+    let distance: u64 = extract_number(&lines[1]);
+    println!("time = {time}");
+    println!("distance = {distance}");
+    let result2: u64 = compute_num_ways(time, distance);
+    println!("result2 = {result2}");
 }
 
 fn extract_numbers(line: &str) -> Vec<u64> {
@@ -64,4 +71,14 @@ fn compute_num_ways(time: u64, distance: u64) -> u64 {
         }
     }
     max_hold_time_int - min_hold_time_int + 1
+}
+
+fn extract_number(line: &str) -> u64 {
+    line[
+        (line.chars().position(|c| c == ':').unwrap() + 1)..line.len()
+    ]
+        .trim()
+        .split_whitespace()
+        .collect::<String>()
+        .parse::<u64>().unwrap()
 }
