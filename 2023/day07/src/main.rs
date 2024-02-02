@@ -85,7 +85,6 @@ enum HandType {
 struct Hand {
     hand_type: HandType,
     cards: Vec<CamelCard>,
-    cards_str: String,
 }
 
 fn compute_hand_type_from_cards(cards: &[CamelCard]) -> HandType {
@@ -122,7 +121,6 @@ fn init_hand_from_string(cards_str: &str) -> Hand {
     Hand {
         hand_type: compute_hand_type_from_cards(&current_cards),
         cards: current_cards,
-        cards_str: cards_str.to_string(),
     }
 }
 
@@ -141,26 +139,27 @@ fn part1(contents: &str) -> u64 {
     players.sort_by(|player_a, player_b| {
         let a: &Hand = &player_a.0;
         let b: &Hand = &player_b.0;
-        match a.hand_type.cmp(&b.hand_type) {
-            Ordering::Less => {Ordering::Less},
-            Ordering::Greater => {Ordering::Greater},
-            Ordering::Equal => {
-                for (card_a, card_b) in a.cards.iter().zip(b.cards.iter()) {
-                    let cmp_result: Ordering = card_a.cmp(&card_b);
-                    if cmp_result != Ordering::Equal {
-                        return cmp_result;
-                    }
+        let ord: Ordering = a.hand_type.cmp(&b.hand_type);
+        if ord == Ordering::Equal {
+            for (card_a, card_b) in a.cards.iter().zip(b.cards.iter()) {
+                let cmp_result: Ordering = card_a.cmp(&card_b);
+                if cmp_result != Ordering::Equal {
+                    return cmp_result;
                 }
-                panic!("");
             }
+            panic!("");
+        }
+        else {
+            return ord;
         }
     });
 
     // println!("players={:?}", players);
-    players.iter().enumerate().fold(0_u64, |acc, tup| {
-        // tup is a tuple of (index, elem)
-        let index: u64 = tup.0 as u64;
-        let elem: &(Hand, u64) = tup.1;
-        acc + ((index + 1)*elem.1)
-    })
+    players
+        .iter()
+        .enumerate()
+        .map(|(index, elem)| {
+            ((index as u64) + 1) * elem.1
+        })
+        .sum()
 }
