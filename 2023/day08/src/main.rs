@@ -55,16 +55,24 @@ fn part1(instructions: &Vec<u64>, network: &HashMap<&str, (&str, &str)>) -> u64 
     let num_instructions: usize = instructions.len();
     loop {
         num_steps += 1;
-        let choices: &(&str, &str) = network.get_key_value(current_node).unwrap().1;
-        let next_node: &str = if instructions[current_instruction_index] == 0 { choices.0 } else { choices.1 };
-        println!("step {num_steps}: current node = {current_node}, next node = {next_node}");
-        if next_node == dest_node {
-            break;
-        }
-        current_node = next_node;
-        current_instruction_index += 1_usize;
-        if current_instruction_index >= num_instructions {
-            current_instruction_index = 0_usize;
+        match network.get_key_value(current_node) {
+            Some(key_value) => {
+                let choices: &(&str, &str) = key_value.1;
+                let next_node: &str = if instructions[current_instruction_index] == 0 { choices.0 } else { choices.1 };
+                println!("step {num_steps}: current node = {current_node}, next node = {next_node}");
+                if next_node == dest_node {
+                    break;
+                }
+                current_node = next_node;
+                current_instruction_index += 1_usize;
+                if current_instruction_index >= num_instructions {
+                    current_instruction_index = 0_usize;
+                }
+            },
+            None => {
+                println!("Cannot find entry {current_node} in the network so terminating.");
+                return 0;
+            },
         }
     }
     num_steps
